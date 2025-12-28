@@ -1,0 +1,9 @@
+{
+  "name": "namma-body-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Netlify Functions for Namma Body contact form",
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}

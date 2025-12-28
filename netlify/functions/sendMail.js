@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 export const handler = async (event) => {
-  // Handle OPTIONS preflight request first
+  // Handle OPTIONS preflight for CORS
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -26,7 +26,16 @@ export const handler = async (event) => {
     };
   }
 
-  const { name, email, message } = JSON.parse(event.body);
+  // Parse payload from frontend
+  const { subject, from, message } = JSON.parse(event.body || "{}");
+
+  if (!subject || !from || !message) {
+    return {
+      statusCode: 400,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: false, error: "Missing required fields" }),
+    };
+  }
 
   try {
     const transporter = nodemailer.createTransport({
@@ -38,26 +47,22 @@ export const handler = async (event) => {
     });
 
     await transporter.sendMail({
-      from: email,
+      from: from,
       to: process.env.MAIL_USER,
-      subject: `Contact from ${name}`,
+      subject: subject,
       text: message,
     });
 
     return {
       statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ success: true }),
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: true }),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ success: false, error: error.message }),
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ ok: false, error: error.message }),
     };
   }
 };

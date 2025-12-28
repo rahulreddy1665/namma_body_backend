@@ -26,7 +26,7 @@ export const handler = async (event) => {
     };
   }
 
-  // Parse payload from frontend
+  // Parsed payload from frontend
   const { subject, from, message } = JSON.parse(event.body || "{}");
 
   if (!subject || !from || !message) {
